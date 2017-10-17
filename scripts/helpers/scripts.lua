@@ -4,7 +4,7 @@
 local scripts = {}
 
 function scripts.split(str)
-    arr = {}
+    local arr = {}
     for i in string.gmatch(str, "%S+") do
         arr[#arr + 1] = i
     end
