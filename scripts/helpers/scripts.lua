@@ -5,7 +5,7 @@ local scripts = {}
 
 -- Splits a string into words.
 function scripts.split(str)
-    arr = {}
+    local arr = {}
     for i in string.gmatch(str, "%S+") do
         arr[#arr + 1] = i
     end

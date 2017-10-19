@@ -38,6 +38,6 @@ hs_err_pid*
 .gradle/
 .idea/
 build/
-config.properties
+config.properties*
 out/
 /scripts/modules_private
