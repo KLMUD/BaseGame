@@ -9,16 +9,17 @@ LOCATION.getLocation = function(player, update)
     local d = DATA.getData("Location", l)
     if not d then
         local err
-        print(l)
-        d = pcall(function() return require('scripts.locations.' .. l) end)
+        pcall(function() d = require('scripts.locations.' .. l) end)
         if not d then
             player.location = "university.zilverling.iapc"
-            print("THERE")
             DATA.setDataFromChat("Player", update, player)
-            return {}
+            TELEGRAM.sendMessage(update.message.chat.id,  "Unknown Location, teleported to default location: " .. player.location)
+
+            return LOCATION.getLocation(player, update)
         end
     end
     return d
 end
+
 
 return LOCATION

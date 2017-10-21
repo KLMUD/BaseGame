@@ -32,6 +32,14 @@ COMMANDTYPES.noCommand = function()
 end
 
 --
+-- A command checker for lines that aren't commands. Curently only used for /say
+--
+COMMANDTYPES.goCommand = function()
+    return function(_, str)
+        return string.sub(str, 1, 2) == "/_", { "/go", string.sub(str, 3) }
+    end
+end
+--
 -- A command checker for commands with a string-that-can-contain-spaces as command.
 --
 COMMANDTYPES.arbyArg = function(arg)

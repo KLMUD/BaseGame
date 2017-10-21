@@ -13,24 +13,27 @@ local helper = require 'scripts.helpers.scripts'
 local PLE = require 'scripts.modules.player.entities'
 local LLE = require 'scripts.modules.location.entities'
 local WLE = require 'scripts.modules.world.entities'
-
+local logilang = require 'scripts.helpers.logilang'
 -- Load commands
 COMMANDS = {}
 local modules = DATA.parse(require 'net.nander.botproject.integrations.GetDirectories'.GET("scripts/modules"))
 local private_modules = DATA.parse(require 'net.nander.botproject.integrations.GetDirectories'.GET("scripts/modules_private"))
 
 for _, v in ipairs(modules) do
-    helper.addCommands(COMMANDS, require ('scripts.modules.' .. v .. '.commands'))
-    print("Loaded module : "..v)
+    helper.addCommands(COMMANDS, require('scripts.modules.' .. v .. '.commands'))
+    print("Loaded module : " .. v)
 end
 for _, v in ipairs(private_modules) do
-    helper.addCommands(COMMANDS, require ('scripts.modules_private.' .. v .. '.commands'))
-    print("Loaded private module : "..v)
+    helper.addCommands(COMMANDS, require('scripts.modules_private.' .. v .. '.commands'))
+    print("Loaded private module : " .. v)
 end
 
 local function execute(func, _, var, update, P, L, W)
     if (func.validator(var, update, P, L, W)) then
-        print("Calling", func.name)
+        print("Calling", func.name, P.name, update.message.from.userName)
+        for _, v in ipairs(var) do
+            print(">", v)
+        end
         return func.call(var, update, P, L, W)
     end
 end
@@ -67,13 +70,17 @@ bot.cmd = function(update)
     local W = WLE.getWorld(P)
     local test = false
     local split = helper.split(update.message.text)
+    local oneActive = false
     for _, v in ipairs(COMMANDS) do
         local b, newSplit = v[1](split, update.message.text)
-
+        oneActive = b or oneActive
         if b then
             local r = execute(v[2], update.message.text, newSplit, update, P, L, W)
             test = test or r
         end
+    end
+    if not oneActive then
+        TELEGRAM.sendReplyMessage(update.message.chat.id, update.message.messageId, "I don't understand that")
     end
     return test
 end

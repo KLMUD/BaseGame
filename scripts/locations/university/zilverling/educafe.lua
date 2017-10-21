@@ -5,10 +5,10 @@
 -- Time: 21:11
 -- To change this template use File | Settings | File Templates.
 --
+local door = require 'scripts.objects.doors.trivialdoor'
 
 return {
     id = "university.zilverling.educafe",
     name = "Educafé",
-    neighbours = { door = "university.zilverling.iapc" },
-    objects = { "Starbucks Mug" }
+    objects = { door("door", "university.zilverling.iapc"), }
 }
