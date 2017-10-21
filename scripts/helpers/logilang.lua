@@ -43,5 +43,6 @@ function logilang.parse(stat, obj)
     return logilang.parsers[stat.func](stat, obj)
 end
 print(logilang.parse(logilang.Or(logilang.isTrue("open"), logilang.isTrue("aa")), {open=true}))
+print(logilang.parse(logilang.Or(logilang.isTrue("open"), logilang.isTrue("aa")), {open=true}))
 
 return logilang
