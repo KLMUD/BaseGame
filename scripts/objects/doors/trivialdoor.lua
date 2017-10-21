@@ -5,10 +5,11 @@
 -- Time: 22:41
 -- To change this template use File | Settings | File Templates.
 --
+local logilang = require 'scripts.helpers.logilang'
 
 return function(name, to)
     return {
         name = name,
-        go = to
+        go = logilang.If(logilang.FiftyFifty(), to, "null")
     }
 end

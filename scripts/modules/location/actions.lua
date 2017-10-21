@@ -4,6 +4,7 @@
 local LOCATION = {}
 local LLE = require 'scripts.modules.location.entities'
 local scripts = require 'scripts.helpers.scripts'
+local logilang = require 'scripts.helpers.logilang'
 
 LOCATION.teleport = {
     name = "teleport",
@@ -21,7 +22,8 @@ LOCATION.where = {
         local str = ""
         for _, v in pairs(location.objects) do
             if v.go then
-                str = str .. "\n" .. v.go .. ": /_" .. v.name
+                print(logilang.parse(v.go))
+                str = str .. "\n" .. logilang.parse(v.go) .. ": /_" .. v.name
             end
         end
         TELEGRAM.sendReplyMessage(update.message.chat.id, update.message.messageId, "You are at " .. player.location .. str)
@@ -38,9 +40,9 @@ LOCATION.go = {
             end
         end
         if to then
-            player.location = to.go
+            player.location = logilang.parse(to.go)
             DATA.setDataFromChat("Player", update, player)
-            TELEGRAM.sendReplyMessage(update.message.chat.id, update.message.messageId, "Set Location to " .. to.go)
+            TELEGRAM.sendReplyMessage(update.message.chat.id, update.message.messageId, "Set Location to " .. player.location)
             location = LLE.getLocation(player, update)
             LOCATION.where.call(l, update, player, location, _)
         else

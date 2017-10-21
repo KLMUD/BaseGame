@@ -5,8 +5,11 @@
 -- Time: 21:58
 -- To change this template use File | Settings | File Templates.
 --
-
+local pprint = require 'scripts.helpers.pprint'
 local logilang = {}
+logilang.If = function(cond, stat1, stat2)
+    return { func = "If", cond = cond, Then = stat1, Else = stat2 }
+end
 logilang.And = function(stat1, stat2)
     return { func = "And", stat1 = stat1, stat2 = stat2 }
 end
@@ -19,12 +22,26 @@ end
 logilang.isFalse = function(cond)
     return { func = "isFalse", cond = cond }
 end
+logilang.FiftyFifty = function()
+    return { func = "FiftyFifty" }
+end
 logilang.parsers = {}
 
 
+function logilang.parsers.If(stat, obj)
+    if logilang.parse(stat.cond) then
+        return logilang.parse(stat.Then, obj)
+    else
+        return logilang.parse(stat.Else, obj)
+    end
+end
 
 function logilang.parsers.And(stat, obj)
     return logilang.parse(stat.stat1, obj) and logilang.parse(stat.stat2, obj)
+end
+
+function logilang.parsers.FiftyFifty(stat, obj)
+    return math.random() > 0.5
 end
 
 function logilang.parsers.Or(stat, obj)
@@ -32,7 +49,7 @@ function logilang.parsers.Or(stat, obj)
 end
 
 function logilang.parsers.isTrue(stat, obj)
-    return not not  obj[stat.cond]
+    return not not obj[stat.cond]
 end
 
 function logilang.parsers.isFalse(stat, obj)
@@ -40,9 +57,10 @@ function logilang.parsers.isFalse(stat, obj)
 end
 
 function logilang.parse(stat, obj)
+    if (type(stat) ~= "table" or not stat.func) then
+        return stat
+    end
     return logilang.parsers[stat.func](stat, obj)
 end
-print(logilang.parse(logilang.Or(logilang.isTrue("open"), logilang.isTrue("aa")), {open=true}))
-print(logilang.parse(logilang.Or(logilang.isTrue("open"), logilang.isTrue("aa")), {open=true}))
 
 return logilang
