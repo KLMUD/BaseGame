@@ -14,17 +14,12 @@ return function(name, code, contents)
         open = false,
         code = code,
         contents = contents,
-        examine =
-        {
-            type = "takeFirstTruth",
-            {
+        examine =logilang.When
+        (
+            logilang.If(
                 logilang.isTrue("open"),
-                { text = "This safe is open", contents = true }
-            },
-            {
-                logilang.isFalse("open"),
+                { text = "This safe is open", contents = true }),
                 { text = "This safe is closed", contents = false }
-            }
-        }
+        )
     }
 end

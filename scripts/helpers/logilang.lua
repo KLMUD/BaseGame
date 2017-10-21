@@ -10,6 +10,10 @@ local logilang = {}
 logilang.If = function(cond, stat1, stat2)
     return { func = "If", cond = cond, Then = stat1, Else = stat2 }
 end
+
+logilang.When = function(...)
+    return { func = "When", lines = { ... } }
+end
 logilang.And = function(stat1, stat2)
     return { func = "And", stat1 = stat1, stat2 = stat2 }
 end
@@ -29,10 +33,19 @@ logilang.parsers = {}
 
 
 function logilang.parsers.If(stat, obj)
-    if logilang.parse(stat.cond) then
+    if logilang.parse(stat.cond, obj) then
         return logilang.parse(stat.Then, obj)
     else
         return logilang.parse(stat.Else, obj)
+    end
+end
+
+function logilang.parsers.When(stat, obj)
+    for _, v in ipairs(stat.lines) do
+        local res = logilang.parse(v, obj)
+        if res then
+            return res
+        end
     end
 end
 
@@ -62,5 +75,15 @@ function logilang.parse(stat, obj)
     end
     return logilang.parsers[stat.func](stat, obj)
 end
+
+
+
+local stat = logilang.When
+(
+    logilang.If(logilang.isTrue("aa"), "test"),
+    logilang.If(logilang.isTrue("aa"), "tet2"),
+    "haha"
+)
+print("ANS", logilang.parse(stat, { door = true }))
 
 return logilang
