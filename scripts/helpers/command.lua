@@ -3,7 +3,6 @@
 --
 
 local COMMANDTYPES = {}
-
 --
 -- A command checker for commands without arguments. Example: /help
 --
@@ -37,6 +36,13 @@ end
 COMMANDTYPES.goCommand = function()
     return function(_, str)
         return string.sub(str, 1, 2) == "/_", { "/go", string.sub(str, 3) }
+    end
+end
+
+-- Used for context.
+COMMANDTYPES.numberCommand = function()
+    return function(_, str, C)
+        return string.sub(str, 1, 1) == "/" and tonumber(str.sub(str,2)) and C and C[tonumber(str.sub(str,2))], { "/ctx", string.sub(str, 2) }
     end
 end
 --

@@ -40,7 +40,7 @@ class Telegram : TwoArgFunction() {
          * @return Nil
          */
         override fun call(id: LuaValue?, message: LuaValue?): LuaValue {
-            Bot.server!!.execute(SendMessage(id!!.tolong(), message.toString()))
+            Bot.server!!.execute(SendMessage(id!!.tolong(), message.toString()).enableMarkdown(true))
             return LuaValue.NIL
         }
     }

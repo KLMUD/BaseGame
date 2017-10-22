@@ -10,6 +10,6 @@ local logilang = require 'scripts.helpers.logilang'
 return function(name, to)
     return {
         name = name,
-        go = logilang.If(logilang.FiftyFifty(), to, "null")
+        go =  to
     }
 end

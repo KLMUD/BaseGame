@@ -5,7 +5,6 @@ local LOCATION = {}
 local LLE = require 'scripts.modules.location.entities'
 local scripts = require 'scripts.helpers.scripts'
 local logilang = require 'scripts.helpers.logilang'
-
 LOCATION.teleport = {
     name = "teleport",
     validator = scripts.onlyHuman,
@@ -18,15 +17,19 @@ LOCATION.teleport = {
 LOCATION.where = {
     name = "where",
     validator = scripts.onlyHuman,
-    call = function(_, update, player, location, _)
-        local str = ""
+    call = function(_, update, player, location, _, C)
+        local str = "\n"
+        local ctx = {}
+
         for _, v in pairs(location.objects) do
             if v.go then
-                print(logilang.parse(v.go))
-                str = str .. "\n" .. logilang.parse(v.go) .. ": /_" .. v.name
+                local l = logilang.parse(v.go)
+                ctx[#ctx+1] = "/go ".. v.name
+                str = str .. "/"..#ctx .. " : ("..v.name..") " .. l .."\n"
             end
         end
         TELEGRAM.sendReplyMessage(update.message.chat.id, update.message.messageId, "You are at " .. player.location .. str)
+        return false, ctx
     end
 }
 LOCATION.go = {
@@ -44,9 +47,12 @@ LOCATION.go = {
             DATA.setDataFromChat("Player", update, player)
             TELEGRAM.sendReplyMessage(update.message.chat.id, update.message.messageId, "Set Location to " .. player.location)
             location = LLE.getLocation(player, update)
-            LOCATION.where.call(l, update, player, location, _)
+            local _, c =   LOCATION.where.call(l, update, player, location, _)
+
+            return false, c
         else
             TELEGRAM.sendReplyMessage(update.message.chat.id, update.message.messageId, "Can't go there,  " .. l[2] .. " isn't a possible route here. You may want to check /where.")
+
         end
     end
 }

@@ -5,15 +5,15 @@ DATA = require('scripts.DATASTORE')
 TELEGRAM = require('net.nander.botproject.integrations.Telegram')
 json = require 'scripts/DATASTORE'
 
-local bot = {}
+bot = {}
 
 local TICKRATE = 100
 local helper = require 'scripts.helpers.scripts'
+local CLE = require 'scripts.modules.context.entities'
 
 local PLE = require 'scripts.modules.player.entities'
 local LLE = require 'scripts.modules.location.entities'
 local WLE = require 'scripts.modules.world.entities'
-local logilang = require 'scripts.helpers.logilang'
 -- Load commands
 COMMANDS = {}
 local modules = DATA.parse(require 'net.nander.botproject.integrations.GetDirectories'.GET("scripts/modules"))
@@ -28,13 +28,13 @@ for _, v in ipairs(private_modules) do
     print("Loaded private module : " .. v)
 end
 
-local function execute(func, _, var, update, P, L, W)
-    if (func.validator(var, update, P, L, W)) then
+function bot.execute(func, _, var, update, P, L, W, C)
+    if (func.validator(var, update, P, L, W, C)) then
         print("Calling", func.name, P.name, update.message.from.userName)
         for _, v in ipairs(var) do
             print(">", v)
         end
-        return func.call(var, update, P, L, W)
+        return func.call(var, update, P, L, W, C)
     end
 end
 
@@ -68,20 +68,27 @@ bot.cmd = function(update)
     local P = PLE.getPlayer(update)
     local L = LLE.getLocation(P, update)
     local W = WLE.getWorld(P)
+    local C = CLE.getContext(update)
+
     local test = false
     local split = helper.split(update.message.text)
     local oneActive = false
+    local NC = {}
     for _, v in ipairs(COMMANDS) do
-        local b, newSplit = v[1](split, update.message.text)
+        local b, newSplit = v[1](split, update.message.text, C)
         oneActive = b or oneActive
         if b then
-            local r = execute(v[2], update.message.text, newSplit, update, P, L, W)
+            local r, c = bot.execute(v[2], update.message.text, newSplit, update, P, L, W, C)
+            NC = c or {}
+
             test = test or r
         end
     end
     if not oneActive then
         TELEGRAM.sendReplyMessage(update.message.chat.id, update.message.messageId, "I don't understand that")
+    else
+        CLE.setContext(update, NC)
     end
-    return test
+    return test, NC
 end
 return bot
