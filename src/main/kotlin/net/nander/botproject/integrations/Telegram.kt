@@ -58,7 +58,7 @@ class Telegram : TwoArgFunction() {
          */
         override fun call(id: LuaValue?, replyTo: LuaValue?, message: LuaValue?): LuaValue {
             val reply = replyTo!!.toint()
-            Bot.server!!.execute(SendMessage(id!!.tolong(), message.toString()).setReplyToMessageId(reply))
+            Bot.server!!.execute(SendMessage(id!!.tolong(), message.toString()).setReplyToMessageId(reply).enableMarkdown(true))
             return LuaValue.NIL
         }
     }

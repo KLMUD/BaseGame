@@ -21,14 +21,18 @@ LOCATION.where = {
         local str = "\n"
         local ctx = {}
 
-        for _, v in pairs(location.objects) do
+        for k, v in pairs(location.objects) do
             if v.go then
-                local l = logilang.parse(v.go)
+                local l = logilang.parse(v.go, v)
                 ctx[#ctx+1] = "/go ".. v.name
                 str = str .. "/"..#ctx .. " : ("..v.name..") " .. l .."\n"
+            else
+                local l = logilang.parse(v.examine, v)
+                ctx[#ctx+1] = "/examine ".. k
+                str = str .. "/"..#ctx .. " : examine " .. v.name .."\n"
             end
         end
-        TELEGRAM.sendReplyMessage(update.message.chat.id, update.message.messageId, "You are at " .. player.location .. str)
+        TELEGRAM.sendReplyMessage(update.message.chat.id, update.message.messageId, "You are at " .. player.location .. str.."")
         return false, ctx
     end
 }
